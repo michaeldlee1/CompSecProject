@@ -2,7 +2,7 @@
 ## Topic 3: Intelligent Anti-Malware Software
 ### Requirements
 1. Extract useful and meaningful features (WIN API calls, n-gram binaries, op instructions, etc.) from given PE files
-  * Given a binary file, write a program to determine if it is a PE file, check if it begins with the magic word “MZ” followed by a DOS stub and has “PE” signature in the PE file header, check if the binary is 32- or 64- bit.
+  * Given a binary file, write a program to determine if it is a PE file: check if it begins with the magic word “MZ” followed by a DOS stub and has “PE” signature in the PE file header, check if the binary is 32- or 64- bit.
      * [Using a hex editor to check bitness of a PE file](https://www.gdatasoftware.com/blog/pebitnesstrick)
      * [How to check if a binary is 32 or 64 bit on Windows](https://superuser.com/questions/358434/how-to-check-if-a-binary-is-32-or-64-bit-on-windows)
   * Given a PE file, write a program code to extract its features

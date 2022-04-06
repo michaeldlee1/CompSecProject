@@ -18,4 +18,3 @@
 ### Resources
 * Class Lectures 16-18
 * [sklearn decision trees tutorial](https://scikit-learn.org/stable/modules/tree.html)
-* 

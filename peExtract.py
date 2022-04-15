@@ -11,16 +11,19 @@ mode = ""
 # functions
 def parseDir(directory):
     for filename in os.listdir(directory):
-        with open(os.path.join(directory, filename), 'r') as f:
-            extractFile(f)
+        path = os.path.join(directory, filename)
+        extractFile(path)
 
 def extractFile(file):
     pe = pefile.PE(file, fast_load=True)
     pe.parse_data_directories()
-    for entry in pe.DIRECTORY_ENTRY_IMPORT:
-        print(entry.dll)
-        for import_item in entry.imports:
-            print(f'{import_item.name}: \t {hex(import_item.address)}')
+    try:
+        for entry in pe.DIRECTORY_ENTRY_IMPORT:
+            print(entry.dll)
+            for import_item in entry.imports:
+                print(f'{import_item.name}: \t {hex(import_item.address)}')
+    except AttributeError:
+        print(f'Attribute Error on: {file}')
 
 # main
 def main():

@@ -1,27 +1,49 @@
-#!/usr/bin/env python3
+
 
 # imports
 import os
 import sys
 import pefile
+import pprint
 
 # globals
 mode = ""
 
 # functions
+# returns a dict of {import: [filename of each file that imports that call], ... }
 def parseDir(directory):
+    imports = {}
+    i = 0
     for filename in os.listdir(directory):
-        with open(os.path.join(directory, filename), 'r') as f:
-            extractFile(f)
-
+        path = directory + "/" + filename
+        file_data = extractFile(path)
+        i += 1  
+        if not file_data:
+            continue
+        for imp in file_data:
+            if imp not in imports:
+                    imports[imp] = [filename]
+            else:
+                imports[imp].append(filename)
+        if i >= 100:
+            break
+    return imports
+        
+# returns a list of the import table for this file 
 def extractFile(file):
-    pe = pefile.PE(file, fast_load=True)
+    imports = []
+    try:
+        pe = pefile.PE(file, fast_load=True)
+    except Exception as e:
+        print(e)
+        return
     pe.parse_data_directories()
     for entry in pe.DIRECTORY_ENTRY_IMPORT:
-        print(entry.dll)
         for import_item in entry.imports:
-            print(f'{import_item.name}: \t {hex(import_item.address)}')
-
+            if import_item.name:
+                imports.append(import_item.name.decode())
+            #print(f'{import_item.name}: \t {hex(import_item.address)}')
+    return imports
 # main
 def main():
     # parse argv
@@ -30,18 +52,20 @@ def main():
         exit(1)
     if sys.argv[1] == '-d': 
         # directory mode
-        directory = sys.argv[2]
+        directory = sys.argv[2] 
         mode = "DIR"
     elif sys.argv[1] == '-f':
-        field = sys.argv[2]
+        file = sys.argv[2]
         mode = "FILE"
     else:
         print("Must specify a mode")
         exit(1)
     if mode == "DIR":
-        parseDir(directory)
+        data = parseDir(directory)
+        for import_name in data.keys():
+            print(f'{import_name}: {len(data[import_name])}')
     else:
-        extractFile(file)
+        data = extractFile(file)
 
 if __name__ == '__main__':
     main()

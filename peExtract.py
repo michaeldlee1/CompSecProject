@@ -1,71 +1,118 @@
+#!/usr/bin/env python3
 
-
-# imports
 import os
 import sys
 import pefile
 import pprint
+from collections import defaultdict
 
-# globals
-mode = ""
 
-# functions
-# returns a dict of {import: [filename of each file that imports that call], ... }
-def parseDir(directory):
-    imports = {}
-    i = 0
-    for filename in os.listdir(directory):
-        path = directory + "/" + filename
-        file_data = extractFile(path)
-        i += 1  
-        if not file_data:
-            continue
-        for imp in file_data:
-            if imp not in imports:
-                    imports[imp] = [filename]
-            else:
-                imports[imp].append(filename)
+def parse_dir(directory):
+    """
+    returns a dict of
+      {
+        file: [imports], ... 
+      }
+    """
+    imports = dict()
+
+    for i, filename in enumerate(os.listdir(directory)):
+        path = os.path.join(directory, filename)
+        imports[filename] = extract_file(path)
+
         if i >= 100:
             break
+
+    return imports
+
+
+def parse_dir_2(directory):
+    """
+    returns a dict of
+      {
+        import: [files (filenames) that import that call], ... 
+      }
+    """
+    dir_imports = defaultdict(list)
+
+    for i, filename in enumerate(os.listdir(directory)):
+        path = os.path.join(directory, filename)
+        file_imports = extract_file(path)
+
+        if not file_imports:
+            continue
+
+        for imp in file_imports:
+            dir_imports[imp].append(filename)
+
+        if i >= 100:
+            break
+
     return imports
         
-# returns a list of the import table for this file 
-def extractFile(file):
+
+def extract_file(filename, sort_imports=True):
+    """
+    returns a list of the import table for this filename 
+    """
     imports = []
+
     try:
-        pe = pefile.PE(file, fast_load=True)
+        pe = pefile.PE(filename, fast_load=True)
     except Exception as e:
-        print(e)
-        return
+        print(e, file=sys.stderr)
+        return None 
+
     pe.parse_data_directories()
     for entry in pe.DIRECTORY_ENTRY_IMPORT:
         for import_item in entry.imports:
             if import_item.name:
                 imports.append(import_item.name.decode())
             #print(f'{import_item.name}: \t {hex(import_item.address)}')
+
+    if sort_imports:
+        imports.sort()
+
     return imports
-# main
+
+
 def main():
-    # parse argv
     if len(sys.argv) < 3:
-        print("Usage: ./peExtract.py -d Directory -f File") # can do -d to do whole directory or -f for just a file
+        # -d for whole directory or -f for just a file
+        print("Usage: ./peExtract.py [-d Directory] [-f File]", file=sys.stderr)
         exit(1)
+
+    # parse args
+    dir_mode = False
+
     if sys.argv[1] == '-d': 
-        # directory mode
         directory = sys.argv[2] 
-        mode = "DIR"
+        dir_mode = True
     elif sys.argv[1] == '-f':
-        file = sys.argv[2]
-        mode = "FILE"
+        filename = sys.argv[2]
     else:
-        print("Must specify a mode")
+        print("Must specify a mode", file=sys.stderr)
         exit(1)
-    if mode == "DIR":
-        data = parseDir(directory)
-        for import_name in data.keys():
-            print(f'{import_name}: {len(data[import_name])}')
+
+    if dir_mode:
+        data = parse_dir(directory)
+
+        for filename in data:
+            print(filename)
+            for api_call in data[filename]:
+                print(f'\t{api_call}')
+
     else:
-        data = extractFile(file)
+        data = extract_file(filename)
+
+        if data is None:
+            print("Invalid PE file", file=sys.stderr)
+            sys.exit(1)
+
+        for api_call in data:
+            print(api_call)
+
 
 if __name__ == '__main__':
     main()
+

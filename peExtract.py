@@ -48,7 +48,7 @@ def parse_dir_2(directory):
         if i >= 100:
             break
 
-    return imports
+    return dir_imports
         
 
 def extract_file(filename, sort_imports=True):
@@ -60,7 +60,7 @@ def extract_file(filename, sort_imports=True):
     try:
         pe = pefile.PE(filename, fast_load=True)
     except Exception as e:
-        print(e, file=sys.stderr)
+        #print(e, file=sys.stderr)
         return None 
 
     pe.parse_data_directories()
@@ -98,6 +98,8 @@ def main():
         data = parse_dir(directory)
 
         for filename in data:
+            if data[filename] == None:
+                continue
             print(filename)
             for api_call in data[filename]:
                 print(f'\t{api_call}')

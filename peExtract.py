@@ -58,15 +58,17 @@ def extract_file(filename, sort_imports=True):
         return None 
 
     pe.parse_data_directories()
-    for entry in pe.DIRECTORY_ENTRY_IMPORT:
-        for import_item in entry.imports:
-            if import_item.name:
-                imports.append(import_item.name.decode())
-            #print(f'{import_item.name}: \t {hex(import_item.address)}')
+    try:
+        for entry in pe.DIRECTORY_ENTRY_IMPORT:
+            for import_item in entry.imports:
+                if import_item.name:
+                    imports.append(import_item.name.decode())
+                #print(f'{import_item.name}: \t {hex(import_item.address)}')
 
-    if sort_imports:
-        imports.sort()
-
+        if sort_imports:
+            imports.sort()
+    except:
+        pass
     return imports
 
 

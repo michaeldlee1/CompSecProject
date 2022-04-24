@@ -20,9 +20,6 @@ def parse_dir(directory):
         path = os.path.join(directory, filename)
         imports[filename] = extract_file(path)
 
-        if i >= 100:
-            break
-
     return imports
 
 
@@ -44,9 +41,6 @@ def parse_dir_2(directory):
 
         for imp in file_imports:
             dir_imports[imp].append(filename)
-
-        if i >= 100:
-            break
 
     return dir_imports
         

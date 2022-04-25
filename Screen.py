@@ -192,7 +192,7 @@ class Screen():
         # Run Mike stuff on filename
         # Display result of running against model
         
-        model = Model.load()
+        model = Model.load('model-decision-tree.pkl')
 
         try:
             filename = os.path.join(self.dirname, filename)

@@ -22,7 +22,12 @@ def test_model(filename, model):
 
 
 def main():
-    model = Model.load()
+    if len(sys.argv) < 2:
+        print(f"Usage: {sys.argv[0]} MODEL_FILE")
+    
+    model_file = sys.argv[1]
+    model = Model.load(model_file)
+
     for line in sys.stdin:
         filename = line.strip()
         if test_model(filename, model):

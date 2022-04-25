@@ -7,25 +7,25 @@ from collections import Counter
 from vocab import Vocab, save_vocab
 
 
-VOCAB_SIZE = 2000
-
-
 def parse_imports_dict(filename):
     with open(filename, 'r') as stream:
         imports = json.load(stream)
     return imports
 
 
-def get_vocab(imports_dict, vocab_size=VOCAB_SIZE):
+def create_vocab(imports_dict):
     """
-    create vocab with "vocab_size" most common imports
+    create vocab with all imports used more than once
     """
     c = Counter()
     for import_list in imports_dict.values():
         c.update(import_list)
+    
     v = Vocab()
-    for word in [imp for imp, freq in c.most_common(vocab_size)]:
-        v.add(word)
+    for word, count in c.items():
+        if count > 1:
+            v.add(word)
+
     return v
 
 
@@ -62,7 +62,7 @@ def main():
     import_list_file = sys.argv[1]
 
     imports_dict = parse_imports_dict(import_list_file)
-    vocab = get_vocab(imports_dict)
+    vocab = create_vocab(imports_dict)
     imports_dict = make_import_vectors(imports_dict, vocab)
 
     with open(import_list_file + ".pre", 'w') as stream:
@@ -74,4 +74,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

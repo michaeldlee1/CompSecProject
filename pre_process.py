@@ -4,6 +4,7 @@ import os
 import sys
 import json
 from collections import Counter
+from vocab import Vocab
 
 
 VOCAB_SIZE = 2000
@@ -20,19 +21,20 @@ def get_vocab(imports_dict, vocab_size=VOCAB_SIZE):
     c = Counter()
     for import_list in imports_dict.values():
         c.update(import_list)
-    return {imp for imp, freq in c.most_common(vocab_size)} | {'<unk>'}
+    v = Vocab()
+    for word in [imp for imp, freq in c.most_common(vocab_size)]:
+        v.add(word)
+    return v
 
 
 def make_import_vectors(imports_dict, vocab):
-    # replace low freq imports with "<unk>"
-    imports_dict_unk = dict()
-    for filename in imports_dict:
-        imports_dict_unk[filename] = [imp if imp in vocab else '<unk>' for imp in imports_dict[filename]]
-
     # create one hot vectors for imports
     imports_dict_pre = dict()
-    for filename, imports in imports_dict_unk.items():
-        c = Counter(imports)
+    for filename, imports in imports_dict.items():
+        # replace low freq imports with "<unk>"
+        imports_pre = [imp if imp in vocab else "<unk>" for imp in imports]
+        # each column corresponds to the number of API calls that file imports  
+        c = Counter(imports_pre)
         imports_dict_pre[filename] = [c[imp] for imp in vocab]
 
     return imports_dict_pre

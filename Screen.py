@@ -21,13 +21,13 @@ class Screen():
         self.createResultWindow()
         
         self.modelName = StringVar()
-        self.modelName.set("model-decision-tree.pkl")
+        self.modelName.set("Decision Tree")
         self.models = [
-            "model-decision-tree.pkl",
-            "model-random-forest.pkl",
-            "model-svm.pkl",
-            "model-naive-bayes.pkl",
-            "model-adaboost.pkl",
+            "AdaBoost",
+            "Random Forest",
+            "Decision Tree",
+            "Naive Bayes",
+            "SVC",
         ]
         self.root.mainloop()
 
@@ -86,6 +86,7 @@ class Screen():
             self.button_analyze_imports.destroy()
             self.listImports.delete(0, END)
             self.label_result.destroy()
+            self.selectModel.destroy()
             self.label_file_explorer.configure(text="File Opened: " + self.listFiles.get(self.listFiles.curselection()))
         except:
             pass
@@ -216,6 +217,9 @@ class Screen():
             self.label_result.destroy()
         except:
             pass
+        
+        self.selectModel = OptionMenu(self.resultFrame, self.modelName, *self.models)
+        self.selectModel.pack()
 
         self.button_analyze_imports = Button(self.resultFrame, text="Analyze Imports",
                                         command=lambda: self.analyzeImports(filename))
@@ -228,15 +232,15 @@ class Screen():
         modelName = self.modelName.get()
         # Display result of running against model
         if modelName == "AdaBoost":
-            model = model.load("model-adaboost.pkl")
+            model = Model.load("model-adaboost.pkl")
         elif modelName == "Random Forest":
-            model = model.load("model-random-forest.pkl")
+            model = Model.load("model-random-forest.pkl")
         elif modelName == "Decision Tree":
-            model = model.load("model-decision-tree.pkl")
+            model = Model.load("model-decision-tree.pkl")
         elif modelName == "Naive Bayes":
-            model = model.load("model-naive-bayes.pkl")
+            model = Model.load("model-naive-bayes.pkl")
         elif modelName == "SVC":
-            model = model.load("model-svc.pkl")
+            model = Model.load("model-svc.pkl")
 
         try:
             filename = os.path.join(self.dirname, filename)
@@ -251,8 +255,8 @@ class Screen():
                                     fg="white")
 
         if test_model(filename, model):
-            self.label_result.configure(text="File is malicious", bg="red")
+            self.label_result.configure(text="Malware Detected", bg="red")
         else:
-            self.label_result.configure(text="File is not malicious", bg="green")
+            self.label_result.configure(text="Malware not Detected", bg="green")
 
         self.label_result.pack()

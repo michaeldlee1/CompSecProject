@@ -57,13 +57,14 @@ class Screen():
     def createFileListWindow(self):
         self.fnameFrame = Frame(self.root)
         self.fnameFrame.place(relwidth=0.47, relheight=0.5, relx=0.01, rely=0.01)
-
+        
         self.label_file_list = Label(self.fnameFrame,
                                     text="Select a File",
                                     width=100, height=2,
                                     fg="blue")
         self.label_file_list.pack()
         self.listFiles = Listbox(self.fnameFrame, width = int(700*.47), height = 20, font=("Courier", 12))
+        self.listFiles.bind("<<ListboxSelect>>", self.clearImports)
         self.listFiles.pack(side="left", fill="y")
         self.scrollbar = Scrollbar(self.fnameFrame, orient="vertical")
         self.scrollbar.pack(side="right", fill="y")
@@ -71,6 +72,15 @@ class Screen():
         self.scrollbar.config(command=self.listFiles.yview)
 
 
+    def clearImports(self, event):
+        try:
+            self.button_analyze_imports.destroy()
+            self.listImports.delete(0, END)
+            self.label_result.destroy()
+            self.label_file_explorer.configure(text="File Opened: " + self.listFiles.get(self.listFiles.curselection()))
+        except:
+            pass
+        
     def createImportWindow(self):
         self.importFrame = Frame(self.root)
         self.importFrame.config(bg="#f73b3b")
@@ -89,7 +99,7 @@ class Screen():
 
     def createResultWindow(self):
         self.resultFrame = Frame(self.root)
-        self.resultFrame.place(relwidth=0.5, relheight=0.5, relx=0.51, rely=0.51)
+        self.resultFrame.place(relwidth=0.5, relheight=0.4, relx=0.51, rely=0.6)
 
     def browseFiles(self):
         filename = filedialog.askopenfilename(initialdir="/",
@@ -98,7 +108,11 @@ class Screen():
                                                          ("all files", "*.*")))
 
         # Change label contents
-        self.label_file_explorer.configure(text="File Opened: " + filename)
+        if filename != "":
+            self.label_file_explorer.configure(text="File Opened: " + filename)
+        else:
+            self.label_file_explorer.configure(text="No File Selected")
+            return
 
         self.showFiles([filename])
 
@@ -107,6 +121,7 @@ class Screen():
             self.button_extract_imports.destroy()
             for widget in self.resultFrame.winfo_children():
                 widget.destroy()
+            self.listImports.delete(0, END)
         except:
             pass
 
@@ -123,12 +138,20 @@ class Screen():
         #Open directory and display files
         self.showFiles(filter(lambda x: x.endswith(".exe"), os.listdir(self.dirname)))
 
+        
         # Change label contents
-        self.label_file_explorer.configure(text="Directory Opened: " + self.dirname)
+        if self.dirname != "":
+            self.label_file_explorer.configure(text="Directory Opened: " + self.dirname)
+        else:
+            self.label_file_explorer.configure(text="No Directory Selected")
+            return
 
         # if buttons already exist, delete them
         try:
             self.button_extract_imports.destroy()
+            for widget in self.resultFrame.winfo_children():
+                widget.destroy()
+            self.listImports.delete(0, END)
         except:
             pass
 
@@ -204,11 +227,11 @@ class Screen():
                                     text="Result",
                                     width=100, height=5,
                                     font=("Courier", 16),
-                                    fg="blue")
+                                    fg="white")
 
         if test_model(filename, model):
-            self.label_result.configure(text="File is malicious", fg="red")
+            self.label_result.configure(text="File is malicious", bg="red")
         else:
-            self.label_result.configure(text="File is not malicious", fg="green")
+            self.label_result.configure(text="File is not malicious", bg="green")
 
         self.label_result.pack()

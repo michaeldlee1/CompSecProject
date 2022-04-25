@@ -2,8 +2,8 @@
 
 import os
 import sys
+import json
 import pefile
-import pprint
 from collections import defaultdict
 
 
@@ -18,7 +18,12 @@ def parse_dir(directory):
 
     for i, filename in enumerate(os.listdir(directory)):
         path = os.path.join(directory, filename)
-        imports[filename] = extract_file(path)
+        file_imports = extract_file(path)
+
+        if file_imports is None:
+            continue
+
+        imports[filename] = file_imports
 
     return imports
 
@@ -36,7 +41,7 @@ def parse_dir_2(directory):
         path = os.path.join(directory, filename)
         file_imports = extract_file(path)
 
-        if not file_imports:
+        if file_imports is None:
             continue
 
         for imp in file_imports:
@@ -54,19 +59,21 @@ def extract_file(filename, sort_imports=True):
     try:
         pe = pefile.PE(filename, fast_load=True)
     except Exception as e:
-        #print(e, file=sys.stderr)
+        print(f"Error parsing {filename}: {e}", file=sys.stderr)
         return None 
 
     pe.parse_data_directories()
-    for entry in pe.DIRECTORY_ENTRY_IMPORT:
-        for import_item in entry.imports:
-            if import_item.name:
-                imports.append(import_item.name.decode())
-            #print(f'{import_item.name}: \t {hex(import_item.address)}')
+    try:
+        for entry in pe.DIRECTORY_ENTRY_IMPORT:
+            for import_item in entry.imports:
+                if import_item.name:
+                    imports.append(import_item.name.decode())
+                #print(f'{import_item.name}: \t {hex(import_item.address)}')
 
-    if sort_imports:
-        imports.sort()
-
+        if sort_imports:
+            imports.sort()
+    except:
+        pass
     return imports
 
 
@@ -86,17 +93,11 @@ def main():
         filename = sys.argv[2]
     else:
         print("Must specify a mode", file=sys.stderr)
-        exit(1)
+        sys.exit(1)
 
     if dir_mode:
         data = parse_dir(directory)
-
-        for filename in data:
-            if data[filename] == None:
-                continue
-            print(filename)
-            for api_call in data[filename]:
-                print(f'\t{api_call}')
+        print(json.dumps(data, indent=2))
 
     else:
         data = extract_file(filename)
@@ -105,8 +106,7 @@ def main():
             print("Invalid PE file", file=sys.stderr)
             sys.exit(1)
 
-        for api_call in data:
-            print(api_call)
+        print(json.dumps(data, indent=2))
 
 
 if __name__ == '__main__':

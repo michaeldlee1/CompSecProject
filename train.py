@@ -7,9 +7,8 @@ import pickle
 import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.naive_bayes import GaussianNB
 import pre_process
 
 
@@ -74,7 +73,7 @@ def main():
     X = list(import_vectors.values())
     y = make_labels(filenames, train_csv)
 
-    model = RandomForestClassifier()
+    model = AdaBoostClassifier()
     model.fit(X, y)
 
     m = Model(model, vocab)

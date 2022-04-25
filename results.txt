@@ -26,3 +26,23 @@ $ ./train.py data/train.csv imports_train.json data/test.csv imports_test.json m
 10: EVENT_SINK_Release (0.008720886883044884)
 
 Accuracy: 0.919
+
+
+$ ./train.py data/train.csv imports_train.json data/test.csv imports_test.json model-naive-bayes.pkl
+Accuracy: 0.702
+
+
+$ ./train.py data/train.csv imports_train.json data/test.csv imports_test.json model-adaboost.pkl
+1: __vbaExceptHandler (0.04)
+2: GetProcAddress (0.04)
+3: WriteConsoleA (0.02)
+4: CorBindToRuntimeEx (0.02)
+5: GetSystemInfo (0.02)
+6: NtOpenProcessToken (0.02)
+7: _amsg_exit (0.02)
+8: OleUninitialize (0.02)
+9: InternetOpenA (0.02)
+10: SetHandleCount (0.02)
+
+Accuracy: 0.828
+

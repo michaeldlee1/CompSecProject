@@ -3,7 +3,8 @@
 import os
 from tkinter import *
 from tkinter import filedialog
-
+from run_model import test_model
+from train import Model
 from peExctFuncs import *
 
 
@@ -104,6 +105,8 @@ class Screen():
         # if buttons already exist, delete them
         try:
             self.button_extract_imports.destroy()
+            for widget in self.resultFrame.winfo_children():
+                widget.destroy()
         except:
             pass
 
@@ -150,12 +153,13 @@ class Screen():
             self.listImports.insert(END, imp)
 
         try:
+            self.label_result.destroy()
             self.button_analyze_imports.destroy()
         except:
             pass
 
         self.button_analyze_imports = Button(self.resultFrame, text="Analyze Imports",
-                                        command=lambda: self.analyzeImports(self.root, filename))
+                                        command=lambda: self.analyzeImports(filename))
         self.button_analyze_imports.pack()
         
         self.root.update()
@@ -174,16 +178,37 @@ class Screen():
         
         try:
             self.button_analyze_imports.destroy()
+            self.label_result.destroy()
         except:
             pass
 
         self.button_analyze_imports = Button(self.resultFrame, text="Analyze Imports",
-                                        command=lambda: self.analyzeImports(self.root, filename))
+                                        command=lambda: self.analyzeImports(filename))
         self.button_analyze_imports.pack()
 
         self.root.update()
 
-    def analyzeImports(self, root, filename):
+    def analyzeImports(self, filename):
         # Run Mike stuff on filename
         # Display result of running against model
-        pass
+        
+        model = Model.load()
+
+        try:
+            filename = os.path.join(self.dirname, filename)
+            self.label_result.destroy()
+        except:
+            pass
+
+        self.label_result = Label(self.resultFrame,
+                                    text="Result",
+                                    width=100, height=5,
+                                    font=("Courier", 16),
+                                    fg="blue")
+
+        if test_model(filename, model):
+            self.label_result.configure(text="File is malicious", fg="red")
+        else:
+            self.label_result.configure(text="File is not malicious", fg="green")
+
+        self.label_result.pack()

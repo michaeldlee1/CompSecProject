@@ -7,10 +7,7 @@ import pre_process
 from train import Model
 
 
-model = Model.load()
-
-
-def test_model(filename):
+def test_model(filename, model):
     """
     Returns True if predicted malware, False if not, or None if invalid file
     """
@@ -25,9 +22,10 @@ def test_model(filename):
 
 
 def main():
+    model = Model.load()
     for line in sys.stdin:
         filename = line.strip()
-        if test_model(filename):
+        if test_model(filename, model):
             print(f"{filename}: malware")
         else:
             print(f"{filename}: not malware")

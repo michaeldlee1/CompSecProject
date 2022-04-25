@@ -4,7 +4,7 @@ import os
 import sys
 import json
 from collections import Counter
-from vocab import Vocab
+from vocab import Vocab, save_vocab
 
 
 VOCAB_SIZE = 2000
@@ -17,7 +17,9 @@ def parse_imports_dict(filename):
 
 
 def get_vocab(imports_dict, vocab_size=VOCAB_SIZE):
-    # create vocab with "vocab_size" most common imports
+    """
+    create vocab with "vocab_size" most common imports
+    """
     c = Counter()
     for import_list in imports_dict.values():
         c.update(import_list)
@@ -28,21 +30,24 @@ def get_vocab(imports_dict, vocab_size=VOCAB_SIZE):
 
 
 def make_import_vectors(imports_dict, vocab):
-    # create one hot vectors for imports
+    """
+    returns dict of filename -> one hot vectors
+    """
+    # returns dict of filename
     imports_dict_pre = dict()
     for filename, imports in imports_dict.items():
-        # replace low freq imports with "<unk>"
-        imports_pre = [imp if imp in vocab else "<unk>" for imp in imports]
-        # each column corresponds to the number of API calls that file imports  
-        c = Counter(imports_pre)
-        imports_dict_pre[filename] = [c[imp] for imp in vocab]
-
+        imports_dict_pre[filename] = make_import_vector(imports, vocab)
     return imports_dict_pre
 
 
-def save_vocab(vocab, stream):
-    for imp in vocab:
-        print(imp, file=stream)
+def make_import_vector(imports_list, vocab):
+    """
+    vec[i] represents number of occurances of i'th import
+    """
+    vec = [0] * len(vocab)
+    for imp in imports_list:
+        vec[vocab.numberize(imp)] += 1
+    return vec
 
 
 def save_preprocessed_imports(imports, stream):

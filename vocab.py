@@ -1,5 +1,19 @@
 import collections.abc
 
+
+def read_vocab(filename):
+    vocab = Vocab()
+    with open(filename, 'r') as stream:
+        for line in stream:
+            vocab.add(line.strip())
+    return vocab
+
+
+def save_vocab(vocab, stream):
+    for imp in vocab:
+        print(imp, file=stream)
+
+
 class Vocab(collections.abc.MutableSet):
     """Set-like data structure that can change words into numbers and back."""
     def __init__(self):
@@ -27,7 +41,7 @@ class Vocab(collections.abc.MutableSet):
         if word in self.word_to_num:
             return self.word_to_num[word]
         else: 
-            return self.word_to_num['<UNK>']
+            return self.word_to_num['<unk>']
 
     def denumberize(self, num):
         """Convert a number into a word."""

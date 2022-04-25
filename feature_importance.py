@@ -9,19 +9,11 @@ import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier 
 from sklearn.metrics import accuracy_score
-from vocab import Vocab
+from vocab import Vocab, read_vocab
 from pre_process import parse_imports_dict, make_import_vectors
 
 
 TOP_FEATURES = 200
-
-
-def read_vocab(filename):
-    vocab = Vocab()
-    with open(filename, 'r') as stream:
-        for line in stream:
-            vocab.add(line.strip())
-    return vocab
 
 
 def make_labels(imports, summary_file):
@@ -51,7 +43,7 @@ def make_labels(imports, summary_file):
 
 
 def main():
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 4:
         print(f"Usage: {sys.argv[0]} SUMMARY_CSV IMPORTS_DICT VOCAB_FILE", file=sys.stderr)
         sys.exit(1)
 
@@ -83,6 +75,7 @@ def main():
     score = model.score(X_test, y_true)
     print(score)
     """
+
 
 
 

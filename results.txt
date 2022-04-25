@@ -1,0 +1,48 @@
+$ ./train.py data/train.csv imports_train.json data/test.csv imports_test.json model-decision-tree.pkl
+1: _amsg_exit (0.18367600145821109)
+2: _CorDllMain (0.17880290931480536)
+3: RtlLookupFunctionEntry (0.09130343781001954)
+4: GetModuleHandleA (0.037464278081547134)
+5: __p__commode (0.028385018083434764)
+6: __vbaExceptHandler (0.028115729238182792)
+7: SetEvent (0.021263720009904882)
+8: GetProcAddress (0.019861600313876144)
+9: <unk> (0.01820282397428034)
+10: DisableThreadLibraryCalls (0.017432720216068658)
+
+Accuracy: 0.899
+
+
+$ ./train.py data/train.csv imports_train.json data/test.csv imports_test.json model-decision-tree.pkl
+1: GetProcAddress (0.035907353225071395)
+2: _CorDllMain (0.028538737234061324)
+3: LoadLibraryA (0.02836379686294764)
+4: ExitProcess (0.016869071979707218)
+5: GetModuleHandleA (0.013909930475706857)
+6: RtlLookupFunctionEntry (0.010667166352151673)
+7: _amsg_exit (0.010610134228877454)
+8: __vbaExceptHandler (0.010382615558921148)
+9: free (0.009970932304158584)
+10: EVENT_SINK_Release (0.008720886883044884)
+
+Accuracy: 0.919
+
+
+$ ./train.py data/train.csv imports_train.json data/test.csv imports_test.json model-naive-bayes.pkl
+Accuracy: 0.702
+
+
+$ ./train.py data/train.csv imports_train.json data/test.csv imports_test.json model-adaboost.pkl
+1: __vbaExceptHandler (0.04)
+2: GetProcAddress (0.04)
+3: WriteConsoleA (0.02)
+4: CorBindToRuntimeEx (0.02)
+5: GetSystemInfo (0.02)
+6: NtOpenProcessToken (0.02)
+7: _amsg_exit (0.02)
+8: OleUninitialize (0.02)
+9: InternetOpenA (0.02)
+10: SetHandleCount (0.02)
+
+Accuracy: 0.828
+

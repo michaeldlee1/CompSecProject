@@ -20,6 +20,15 @@ class Screen():
         self.createFileListWindow()
         self.createResultWindow()
         
+        self.modelName = StringVar()
+        self.modelName.set("model-decision-tree.pkl")
+        self.models = [
+            "model-decision-tree.pkl",
+            "model-random-forest.pkl",
+            "model-svm.pkl",
+            "model-naive-bayes.pkl",
+            "model-adaboost.pkl",
+        ]
         self.root.mainloop()
 
 
@@ -180,6 +189,9 @@ class Screen():
             self.button_analyze_imports.destroy()
         except:
             pass
+        
+        self.selectModel = OptionMenu(self.resultFrame, self.modelName, *self.models)
+        self.selectModel.pack()
 
         self.button_analyze_imports = Button(self.resultFrame, text="Analyze Imports",
                                         command=lambda: self.analyzeImports(filename))
@@ -212,10 +224,19 @@ class Screen():
         self.root.update()
 
     def analyzeImports(self, filename):
-        # Run Mike stuff on filename
+        # Get current model selection from dropdown
+        modelName = self.modelName.get()
         # Display result of running against model
-        
-        model = Model.load()
+        if modelName == "AdaBoost":
+            model = model.load("model-adaboost.pkl")
+        elif modelName == "Random Forest":
+            model = model.load("model-random-forest.pkl")
+        elif modelName == "Decision Tree":
+            model = model.load("model-decision-tree.pkl")
+        elif modelName == "Naive Bayes":
+            model = model.load("model-naive-bayes.pkl")
+        elif modelName == "SVC":
+            model = model.load("model-svc.pkl")
 
         try:
             filename = os.path.join(self.dirname, filename)

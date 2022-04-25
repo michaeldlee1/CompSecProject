@@ -1,30 +1,29 @@
 #!/usr/bin/env python3
 # ex:
-#   ./train.py data/train.csv imports_train.json data/test.csv imports_test.json
+#   ./train.py data/train.csv imports_train.json data/test.csv imports_test.json model-random-forest.pkl
 
 import sys
 import pickle
 import numpy as np
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier 
-from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.naive_bayes import GaussianNB
 import pre_process
 
 
 class Model:
-    storage_location = 'model.pkl'
-
     def __init__(self, sklearn_model, vocab):
         self.sklearn_model = sklearn_model
         self.vocab = vocab
     
-    def save(self):
-        with open(self.storage_location, 'wb') as stream:
+    def save(self, storage_location):
+        with open(storage_location, 'wb') as stream:
             pickle.dump(self, stream)
     
     @classmethod
-    def load(cls):
-        with open(cls.storage_location, 'rb') as stream:
+    def load(cls, storage_location):
+        with open(storage_location, 'rb') as stream:
             return pickle.load(stream)
 
 
@@ -56,16 +55,17 @@ def make_labels(filenames, summary_file):
 
 def main():
     if len(sys.argv) < 5:
-        print(f"Usage: {sys.argv[0]} TRAIN_CSV TRAIN_DICT TEST_CSV TEST_DICT", file=sys.stderr)
+        print(f"Usage: {sys.argv[0]} TRAIN_CSV TRAIN_DICT TEST_CSV TEST_DICT OUTPUT_MODEL", file=sys.stderr)
         sys.exit(1)
 
     train_csv = sys.argv[1]
     train_dict = sys.argv[2]
     test_csv = sys.argv[3]
     test_dict   = sys.argv[4]
+    storage_location = sys.argv[5]
 
     imports_data = pre_process.parse_imports_dict(train_dict)
-    vocab = pre_process.get_vocab(imports_data)
+    vocab = pre_process.create_vocab(imports_data)
     import_vectors = pre_process.make_import_vectors(imports_data, vocab)
 
     filenames = list(import_vectors.keys())
@@ -73,13 +73,21 @@ def main():
     X = list(import_vectors.values())
     y = make_labels(filenames, train_csv)
 
-    model = DecisionTreeClassifier()
+    model = AdaBoostClassifier()
     model.fit(X, y)
 
     m = Model(model, vocab)
-    print(f"Saving model to {m.storage_location}")
-    m.save()
-    
+    print(f"Saving model to {storage_location}")
+    m.save(storage_location)
+
+    # print feature importances
+    importance = np.array(model.feature_importances_)
+    top_n = np.argsort(importance)[-10:][::-1]
+    for rank, i in enumerate(top_n, 1):
+        print(f"{rank}: {vocab.denumberize(i)} ({importance[i]})")
+
+    print()
+
     # run on test set
     import_vectors_test = pre_process.make_import_vectors(pre_process.parse_imports_dict(test_dict), vocab)
     X_test = list(import_vectors_test.values())

@@ -1,3 +1,43 @@
+MOST COMMON API IMPORTS:
+1: GetProcAddress (2440)
+2: GetLastError (2191)
+3: GetCurrentThreadId (2152)
+4: GetCurrentProcess (2137)
+5: Sleep (2117)
+6: CloseHandle (2056)
+7: GetCurrentProcessId (2021)
+8: GetTickCount (2012)
+9: TerminateProcess (1981)
+10: UnhandledExceptionFilter (1971)
+
+_____
+
+Most common API imports (malware)
+1: GetProcAddress (1422 times)  (overall rank = [0])
+2: ExitProcess (1154 times)  (overall rank = [18])
+3: GetLastError (1092 times)  (overall rank = [1])
+4: CloseHandle (1063 times)  (overall rank = [5])
+5: LoadLibraryA (1042 times)  (overall rank = [16])
+6: GetModuleHandleA (996 times)  (overall rank = [25])
+7: WriteFile (959 times)  (overall rank = [15])
+8: Sleep (942 times)  (overall rank = [4])
+9: GetCurrentProcess (931 times)  (overall rank = [3])
+10: GetCurrentThreadId (921 times)  (overall rank = [2])
+
+Most common API imports (non-malware)
+1: GetCurrentThreadId (1231 times) (overall rank = [2])
+2: GetCurrentProcess (1206 times) (overall rank = [3])
+3: GetSystemTimeAsFileTime (1198 times) (overall rank = [10])
+4: QueryPerformanceCounter (1196 times) (overall rank = [11])
+5: GetCurrentProcessId (1195 times) (overall rank = [6])
+6: TerminateProcess (1181 times) (overall rank = [8])
+7: Sleep (1175 times) (overall rank = [4])
+8: UnhandledExceptionFilter (1165 times) (overall rank = [9])
+9: SetUnhandledExceptionFilter (1157 times) (overall rank = [12])
+10: GetTickCount (1147 times) (overall rank = [7])
+
+-----
+
 $ ./train.py data/train.csv imports_train.json data/test.csv imports_test.json model-decision-tree.pkl
 1: _amsg_exit (0.18367600145821109)
 2: _CorDllMain (0.17880290931480536)
@@ -13,7 +53,7 @@ $ ./train.py data/train.csv imports_train.json data/test.csv imports_test.json m
 Accuracy: 0.899
 
 
-$ ./train.py data/train.csv imports_train.json data/test.csv imports_test.json model-decision-tree.pkl
+$ ./train.py data/train.csv imports_train.json data/test.csv imports_test.json model-random-forest.pkl
 1: GetProcAddress (0.035907353225071395)
 2: _CorDllMain (0.028538737234061324)
 3: LoadLibraryA (0.02836379686294764)

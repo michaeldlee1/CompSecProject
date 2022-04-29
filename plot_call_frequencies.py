@@ -18,7 +18,7 @@ def get_call_freq(imports_dict):
     c = Counter()
     for import_list in imports_dict.values():
         c.update(import_list)
-    return np.array(list(c.values()))
+    return c
 
 
 def main():
@@ -30,13 +30,22 @@ def main():
 
     imports_dict = parse_imports_dict(import_list_file)
 
-    freq = get_call_freq(imports_dict)
-    plt.hist(freq, bins=100, log=True)
-    """
+    call_freq = get_call_freq(imports_dict)
+    calls = np.array(list(call_freq.keys()))
+    freq = np.array(list(call_freq.values()))
+
+    print("Most common API imports")
+    top_n = np.argsort(freq)[-10:][::-1]
+    for rank, i in enumerate(top_n, 1):
+        print(f"{rank}: {calls[i]} ({freq[i]})")
+
     x = list(range(len(freq)))
     y = sorted(freq)
+
     plt.bar(x, y, log=True)
-    """
+    plt.title('API Call Frequency')
+    plt.xlabel('API Call')
+    plt.ylabel('Frequency')
     plt.show()
 
 

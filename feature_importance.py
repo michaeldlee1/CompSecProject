@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 # ex:
-#   ./feature_importance.py data/train.csv imports_train.json.pre imports_train.json.vocab
+#   ./feature_importance.py data/train.csv imports_train.json
 
 import os
 import sys
 import json
 import numpy as np
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier 
-from sklearn.metrics import accuracy_score
-from vocab import Vocab, read_vocab
-from pre_process import parse_imports_dict, make_import_vectors
+from sklearn.ensemble import RandomForestClassifier
+import pre_process
 
 
-TOP_FEATURES = 200
+TOP_FEATURES = 10
 
 
 def make_labels(imports, summary_file):
@@ -43,42 +41,30 @@ def make_labels(imports, summary_file):
 
 
 def main():
-    if len(sys.argv) < 4:
-        print(f"Usage: {sys.argv[0]} SUMMARY_CSV IMPORTS_DICT VOCAB_FILE", file=sys.stderr)
+    if len(sys.argv) < 3:
+        print(f"Usage: {sys.argv[0]} SUMMARY_CSV IMPORTS_DICT", file=sys.stderr)
         sys.exit(1)
 
     summary_path = sys.argv[1]
     imports_file = sys.argv[2]
-    vocab_file   = sys.argv[3]
 
-    imports_data = parse_imports_dict(imports_file)
-    imports = list(imports_data.keys())
+    imports_data = pre_process.parse_imports_dict(imports_file)
+    vocab = pre_process.create_vocab(imports_data)
+
+    import_vectors = pre_process.make_import_vectors(imports_data, vocab)
+    filenames = list(import_vectors.keys())
     
-    X = list(imports_data.values())
-    y = make_labels(imports, summary_path)
+    X = list(import_vectors.values())
+    y = make_labels(filenames, summary_path)
 
-    model = DecisionTreeClassifier()
+    model = RandomForestClassifier()
     model.fit(X, y)
-
-    vocab = read_vocab(vocab_file)
 
     importance = np.array(model.feature_importances_)
     top_n = np.argsort(importance)[-TOP_FEATURES:][::-1]
-    for rank, i in enumerate(top_n, 1):
-        print(f"{rank}: {vocab.denumberize(i)} ({importance[i]})")
-
-    """
-    # run on test set
-    import_vectors = make_import_vectors(parse_imports_dict('imports_test.json'), vocab)
-    X_test = list(import_vectors.values())
-    y_true = make_labels(list(import_vectors.keys()), 'data/test.csv')  
-    score = model.score(X_test, y_true)
-    print(score)
-    """
-
-
+    for i in top_n:
+        print(vocab.denumberize(i), importance[i], sep='\t')
 
 
 if __name__ == "__main__":
     main()
-

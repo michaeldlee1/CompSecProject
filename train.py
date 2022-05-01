@@ -2,6 +2,7 @@
 # ex:
 #   ./train.py data/train.csv imports_train.json data/test.csv imports_test.json model-random-forest.pkl
 
+import os
 import sys
 import pickle
 import numpy as np
@@ -13,17 +14,21 @@ import pre_process
 
 
 class Model:
+    model_dir = 'models'
+
     def __init__(self, sklearn_model, vocab):
         self.sklearn_model = sklearn_model
         self.vocab = vocab
     
-    def save(self, storage_location):
-        with open(storage_location, 'wb') as stream:
+    def save(self, name):
+        path = os.path.join(self.model_dir, name)
+        with open(path, 'wb') as stream:
             pickle.dump(self, stream)
     
     @classmethod
-    def load(cls, storage_location):
-        with open(storage_location, 'rb') as stream:
+    def load(cls, name):
+        path = os.path.join(cls.model_dir, name)
+        with open(path, 'rb') as stream:
             return pickle.load(stream)
 
 
@@ -73,7 +78,10 @@ def main():
     X = list(import_vectors.values())
     y = make_labels(filenames, train_csv)
 
+    # model selection
     model = AdaBoostClassifier()
+
+    # train
     model.fit(X, y)
 
     m = Model(model, vocab)

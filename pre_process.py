@@ -13,13 +13,13 @@ def parse_imports_dict(filename):
     return imports
 
 
-def create_vocab(imports_dict):
+def create_vocab(imports_list):
     """
     create vocab with all imports used more than once
     """
     c = Counter()
-    for import_list in imports_dict.values():
-        c.update(import_list)
+    for imports in imports_list:
+        c.update(imports)
     
     v = Vocab()
     for word, count in c.items():
@@ -38,6 +38,15 @@ def make_import_vectors(imports_dict, vocab):
     for filename, imports in imports_dict.items():
         imports_dict_pre[filename] = make_import_vector(imports, vocab)
     return imports_dict_pre
+
+
+def make_import_vectors_2(imports_list, vocab):
+    """
+    returns list of one hot vectors
+    """
+    return [
+        make_import_vector(imports, vocab) for imports in imports_list
+    ]
 
 
 def make_import_vector(imports_list, vocab):
@@ -62,7 +71,7 @@ def main():
     import_list_file = sys.argv[1]
 
     imports_dict = parse_imports_dict(import_list_file)
-    vocab = create_vocab(imports_dict)
+    vocab = create_vocab(imports_dict.values())
     imports_dict = make_import_vectors(imports_dict, vocab)
 
     with open(import_list_file + ".pre", 'w') as stream:

@@ -81,7 +81,7 @@ def main():
     train_dict = sys.argv[2]
 
     imports_data = pre_process.parse_imports_dict(train_dict)
-    vocab = pre_process.create_vocab(imports_data)
+    vocab = pre_process.create_vocab(imports_data.values())
 
     call_freq = get_call_freq(imports_data)
     calls = np.array(list(call_freq.keys()))

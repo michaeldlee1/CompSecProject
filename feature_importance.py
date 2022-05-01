@@ -49,7 +49,7 @@ def main():
     imports_file = sys.argv[2]
 
     imports_data = pre_process.parse_imports_dict(imports_file)
-    vocab = pre_process.create_vocab(imports_data)
+    vocab = pre_process.create_vocab(imports_data.values())
 
     import_vectors = pre_process.make_import_vectors(imports_data, vocab)
     filenames = list(import_vectors.keys())
